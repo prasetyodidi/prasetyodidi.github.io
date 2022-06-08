@@ -1,0 +1,513 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+      "title": "Bookshelf OpenAPI",
+      "description": "API Specification For Bookshelf API",
+      "version": "1.0.0",
+      "contact": {
+        "name": "Didi Prasetyo",
+        "url": "didiprasetyo.tech",
+        "email": "didiprasetyo360@gmail.com"
+      },
+      "license": {
+        "name": "Apache 2.0",
+        "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+      }
+    },
+    "servers": [
+      {
+        "url": "http://localhost:4000/",
+        "description": "Default API Server"
+      },
+      {
+        "url": "https://{environment}.bookself/",
+        "description": "The production API Server",
+        "variables": {
+          "environment": {
+            "default": "dev",
+            "enum": [
+              "dev",
+              "qa",
+              "prod"
+            ]
+          }
+        }
+      }
+    ],
+    "paths": {
+      "/books": {
+        "get": {
+          "description": "Return all books form the system",
+          "responses": {
+            "200": {
+              "description": "Success get all books",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "type": "string"
+                      },
+                      "data": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "published": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "required": ["status", "data"]
+                  },
+                  "examples": {
+                    "Buku A": {
+                      "value": {
+                        "id": "jfhjkgfkjgkjjrdu",
+                        "name": "Buku A",
+                        "publisher": "Gramedia"
+                      }
+                    },
+                    "Buku B": {
+                      "value": {
+                        "id": "dfgsdhfjdsjkjybf",
+                        "name": "Buku B",
+                        "publisher": "Amerta"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "post": {
+          "description": "Add new Book",
+          "requestBody": {
+            "$ref": "#/components/requestBodies/createOrUpdateBook"
+          },
+          "responses": {
+            "201": {
+              "description": "Add a new book to system",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "type": "string"
+                      },
+                      "message": {
+                        "type": "string"
+                      },
+                      "data": {
+                        "type": "object",
+                        "properties": {
+                          "bookId": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    },
+                    "required": ["status", "message"]
+                  },
+                  "examples": {
+                    "Buku A": {
+                      "value": {
+                        "status": "success",
+                        "message": "Buku berhasil ditambahkan",
+                        "data": {
+                          "bookId": "bvjebkrkfkeridyg"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "",
+              "content": {
+                "application/json":{
+                  "schema": {
+                    "$ref": "#/components/schemas/statusMessageResponse"
+                  },
+                  "examples": {
+                    "parameterNameUndefined": {
+                      "description": "failed add a new book",
+                      "value": {
+                        "status": "fail",
+                        "message": "Gagal menambahkan buku. Mohon isi nama buku"
+                      }
+                    },
+                    "parameterReadBookBigger": {
+                      "description": "failed add a new book",
+                      "value": {
+                        "status": "fail",
+                        "message": "Gagal menambahkan buku. readPage tidak boleh lebih besar dari pageCount"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/books/{bookId}": {
+        "get": {
+          "parameters": [
+            {
+              "$ref": "#/components/parameters/bookId"
+            },
+            {
+              "name": "reading",
+              "in": "query",
+              "description": "Get all book by reading status",
+              "required": false,
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  }
+                }
+              }
+            },
+            {
+              "name": "finished",
+              "in": "query",
+              "required": false,
+              "description": "Get all book by finished status",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  }
+                }
+              }
+            },
+            {
+              "name": "name",
+              "in": "query",
+              "required": false,
+              "description": "Get all book by finished status",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  }
+                }
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Success get a book by id",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "status": {
+                        "type": "string"
+                      },
+                      "data": {
+                        "type": "object",
+                        "properties": {
+                          "book": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "year": {
+                                "type": "integer"
+                              },
+                              "author": {
+                                "type": "string"
+                              },
+                              "summary": {
+                                "type": "string"
+                              },
+                              "publisher": {
+                                "type": "string"
+                              },
+                              "pageCount": {
+                                "type": "integer"
+                              },
+                              "readPage": {
+                                "type": "integer"
+                              },
+                              "finished": {
+                                "type": "boolean"
+                              },
+                              "reading": {
+                                "type": "boolean"
+                              },
+                              "insertedAt": {
+                                "type": "string"
+                              },
+                              "updatedAt": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "required": ["status", "data"]
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "Book not found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/statusMessageResponse"
+                  },
+                  "examples": {
+                    "idNotFound": {
+                      "value": {
+                        "status": "fail",
+                        "message": "Buku tidak ditemukan"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "put": {
+          "description": "Edit a book",
+          "parameters": [
+            {
+              "$ref": "#/components/parameters/bookId"
+            }
+          ],
+          "requestBody": {
+            "$ref": "#/components/requestBodies/createOrUpdateBook"
+          },
+          "responses": {
+            "200": {
+              "description": "Success updated a book",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/statusMessageResponse"
+                  },
+                  "examples": {
+                    "success": {
+                      "value": {
+                        "status": "success",
+                        "message": "Buku berhasil diperbarui"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "request body invalid",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/statusMessageResponse"
+                  },
+                  "examples": {
+                    "nameUndefined": {
+                      "value": {
+                        "status": "fail",
+                        "message": "Gagal memperbarui buku. Mohon isi nama buku"
+                      }
+                    },
+                    "readBookBiggerThanPageCount": {
+                      "value": {
+                        "status": "fail",
+                        "message": "Gagal memperbarui buku. readPage tidak boleh lebih besar dari pageCount"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "Book id not found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/statusMessageResponse"
+                  },
+                  "examples": {
+                    "fail": {
+                      "value": {
+                        "status": "fail",
+                        "message": "Gagal memperbaharui buku. Id tidak ditemukan"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "delete": {
+          "parameters": [
+            {
+              "$ref": "#/components/parameters/bookId"
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Success deleted a book",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/statusMessageResponse"
+                  },
+                  "examples": {
+                    "success": {
+                      "value": {
+                        "status": "success",
+                        "message": "Buku berhasil dihapus"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "404": {
+              "description": "Book id not found",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/statusMessageResponse"
+                  },
+                  "examples": {
+                    "fail": {
+                      "value": {
+                        "status": "fail",
+                        "message": "Buku gagal dihapus. Id tidak ditemukan"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "parameters": {
+        "bookId": {
+          "name": "bookId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          }
+        }
+      },
+      "requestBodies": {
+        "createOrUpdateBook": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "year": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "author": {
+                    "type": "string"
+                  },
+                  "summary": {
+                    "type": "string"
+                  },
+                  "publisher": {
+                    "type": "string"
+                  },
+                  "pageCount": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "readPage": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "reading": {
+                    "type": "boolean"
+                  }
+                },
+                "required": ["name", "year", "author", "summary", "publisher", "pageCount", "readPage", "reading"]
+              },
+              "examples": {
+                "Buku A": {
+                  "description": "Example buku A",
+                  "value": {
+                    "name": "Buku A",
+                    "year": "2022",
+                    "author": "Didi Prasetyo",
+                    "summary": "Lorem ipsum dolor sit amet",
+                    "publisher": "gramedia"
+                  }
+                },
+                "Buku B": {
+                  "description": "Example buku B",
+                  "value": {
+                    "name": "Buku B",
+                    "year": "2021",
+                    "author": "Ucup",
+                    "summary": "Lorem Dolor sit Ametttt",
+                    "publisher": "Amerta"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "schemas": {
+        "statusMessageResponse": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string"
+            },
+            "message": {
+              "type": "string"
+            }
+          },
+          "required": ["status", "message"]
+        }
+      }
+    }
+  }
+  
